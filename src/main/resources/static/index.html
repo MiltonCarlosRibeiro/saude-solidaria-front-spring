@@ -16,10 +16,10 @@
   <section>
     <div class="section-header">
       <h2>Beneficiários</h2>
-      <button class="btn-add" data-type="beneficiarios" data-fields="nomeCompleto,cpf,email,endereco,telefone">Novo Beneficiário</button>
+      <button class="btn-add" data-type="beneficiarios" data-fields="nomeCompleto,cpf,email,endereco,telefone,medicamentoSolicitado">Novo Beneficiário</button>
     </div>
     <table id="tbl-beneficiarios">
-      <thead><tr><th>Nome Completo</th><th>CPF</th><th>Email</th><th>Telefone</th><th>Ações</th></tr></thead>
+      <thead><tr><th>Nome Completo</th><th>CPF</th><th>Email</th><th>Telefone</th><th>Medicamento Solicitado</th><th>Ações</th></tr></thead>
       <tbody></tbody>
     </table>
   </section>
@@ -63,7 +63,7 @@
       <button class="btn-add" data-type="doacoes" data-fields="doadorId,beneficiarioId,medicamentoId,quantidade,status,dataSolicitacao">Nova Doação</button>
     </div>
     <table id="tbl-doacoes">
-      <thead><tr><th>Beneficiário ID</th><th>Medicamento ID</th><th>Status</th><th>Qtd</th><th>Data Solicitação</th><th>Ações</th></tr></thead>
+      <thead><tr><th>Beneficiário</th><th>Medicamento</th><th>Doador</th><th>Status</th><th>Qtd</th><th>Data Solicitação</th><th>Ações</th></tr></thead>
       <tbody></tbody>
     </table>
   </section>

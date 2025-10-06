@@ -1,11 +1,8 @@
 const API_BASE_URL = "/api";
 
-// Função genérica para requisições fetch
+// Função genérica para requisições fetch (sem alterações)
 async function apiRequest(endpoint, method = "GET", body = null) {
-  const options = {
-    method,
-    headers: {},
-  };
+  const options = { method, headers: {} };
   if (body) {
     options.headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(body);
@@ -22,7 +19,7 @@ async function apiRequest(endpoint, method = "GET", body = null) {
   return null;
 }
 
-// Preenche uma tabela com dados e botões de ação
+// Preenche uma tabela com dados e botões de ação (sem alterações)
 function fillTable(tbody, rows, cols, type) {
   tbody.innerHTML = "";
   rows.forEach(row => {
@@ -49,84 +46,53 @@ function fillTable(tbody, rows, cols, type) {
   });
 }
 
-// Manipulador para DELETAR um item
-async function handleDelete(type, id) {
-  if (!confirm(`Tem certeza que deseja excluir este item?`)) return;
-  try {
-    await apiRequest(`/${type}/${id}`, "DELETE");
-    loadAll();
-  } catch (e) {
-    alert(e.message);
-    console.error(e);
-  }
-}
+// Funções handleCreate, handleEdit, handleDelete (sem alterações)
+async function handleDelete(type, id) { if (!confirm(`Tem certeza que deseja excluir este item?`)) return; try { await apiRequest(`/${type}/${id}`, "DELETE"); loadAll(); } catch (e) { alert(e.message); console.error(e); } }
+async function handleEdit(type, item) { const fields = document.querySelector(`.btn-add[data-type="${type}"]`).dataset.fields.split(','); const updatedItem = { ...item }; let hasChanged = false; for (const field of fields) { if (field === 'id') continue; const newValue = prompt(`Editar ${field}:`, item[field] ?? ""); if (newValue === null) return; if (newValue !== item[field]) { updatedItem[field] = newValue; hasChanged = true; } } if (hasChanged) { try { await apiRequest(`/${type}/${item.id}`, "PUT", updatedItem); loadAll(); } catch (e) { alert(e.message); console.error(e); } } }
+async function handleCreate(type, fields) { const newItem = {}; for (const field of fields) { const value = prompt(`Digite o valor para ${field}:`); if (value === null) return; newItem[field] = value; } try { await apiRequest(`/${type}`, "POST", newItem); loadAll(); } catch (e) { alert(e.message); console.error(e); } }
 
-// Manipulador para EDITAR (UPDATE) um item
-async function handleEdit(type, item) {
-  const fields = document.querySelector(`.btn-add[data-type="${type}"]`).dataset.fields.split(',');
-  const updatedItem = { ...item };
-  let hasChanged = false;
-  for (const field of fields) {
-    if (field === 'id') continue;
-    const newValue = prompt(`Editar ${field}:`, item[field] ?? "");
-    if (newValue === null) return;
-    if (newValue !== item[field]) {
-      updatedItem[field] = newValue;
-      hasChanged = true;
-    }
-  }
-  if (hasChanged) {
-    try {
-      await apiRequest(`/${type}/${item.id}`, "PUT", updatedItem);
-      loadAll();
-    } catch (e) {
-      alert(e.message);
-      console.error(e);
-    }
-  }
-}
-
-// Manipulador para CRIAR um novo item
-async function handleCreate(type, fields) {
-  const newItem = {};
-  for (const field of fields) {
-    const value = prompt(`Digite o valor para ${field}:`);
-    if (value === null) return;
-    newItem[field] = value;
-  }
-  try {
-    await apiRequest(`/${type}`, "POST", newItem);
-    loadAll();
-  } catch (e) {
-    alert(e.message);
-    console.error(e);
-  }
-}
-
-// Carrega todos os dados das APIs e preenche as tabelas
+// Carrega todos os dados das APIs e preenche as tabelas (LÓGICA PRINCIPAL ALTERADA AQUI)
 async function loadAll() {
   try {
-    const [beneficiarios, ind, corp, medicamentos, doacoes] = await Promise.all([
+    const [beneficiarios, doadoresInd, doadoresCorp, medicamentos, doacoes] = await Promise.all([
       apiRequest("/beneficiarios"),
       apiRequest("/doadores-individuais"),
       apiRequest("/doadores-corporativos"),
       apiRequest("/medicamentos"),
       apiRequest("/doacoes")
     ]);
-    fillTable(document.querySelector("#tbl-beneficiarios tbody"), beneficiarios, ["nomeCompleto", "cpf", "email", "telefone"], "beneficiarios");
-    fillTable(document.querySelector("#tbl-doadores-ind tbody"), ind, ["nome", "email", "telefone"], "doadores-individuais");
-    // ALTERAÇÃO AQUI: Usando os novos campos de Doador Corporativo
+
+    // LÓGICA DE CRUZAMENTO DE DADOS (sem alterações)
+    const beneficiariosMap = new Map(beneficiarios.map(b => [b.id, b.nomeCompleto]));
+    const medicamentosMap = new Map(medicamentos.map(m => [m.id, m.nome]));
+    const doadoresIndMap = new Map(doadoresInd.map(i => [i.id, i.nome]));
+    const doadoresCorpMap = new Map(doadoresCorp.map(c => [c.id, c.razaoSocial]));
+    const doacoesEnriquecidas = doacoes.map(doacao => {
+      const beneficiarioNome = beneficiariosMap.get(doacao.beneficiarioId) || doacao.beneficiarioId;
+      const medicamentoNome = medicamentosMap.get(doacao.medicamentoId) || doacao.medicamentoId;
+      const doadorNome = doadoresIndMap.get(doacao.doadorId) || doadoresCorpMap.get(doacao.doadorId) || doacao.doadorId;
+      return {
+        ...doacao,
+        beneficiarioNome: beneficiarioNome,
+        medicamentoNome: medicamentoNome,
+        doadorNome: doadorNome,
+      };
+    });
+
+    // ALTERAÇÃO AQUI: Adicionado "medicamentoSolicitado" à lista de colunas
+    fillTable(document.querySelector("#tbl-beneficiarios tbody"), beneficiarios, ["nomeCompleto", "cpf", "email", "telefone", "medicamentoSolicitado"], "beneficiarios");
+    fillTable(document.querySelector("#tbl-doadores-ind tbody"), doadoresInd, ["nome", "email", "telefone"], "doadores-individuais");
     fillTable(document.querySelector("#tbl-doadores-corp tbody"), corp, ["razaoSocial", "nomeFantasia", "cnpj", "statusConta"], "doadores-corporativos");
-    // ALTERAÇÃO AQUI: Usando os novos campos de Medicamento
     fillTable(document.querySelector("#tbl-medicamentos tbody"), medicamentos, ["nome", "principioAtivo", "status", "quantidade"], "medicamentos");
-    fillTable(document.querySelector("#tbl-doacoes tbody"), doacoes, ["beneficiarioId", "medicamentoId", "status", "quantidade", "dataSolicitacao"], "doacoes");
+    fillTable(document.querySelector("#tbl-doacoes tbody"), doacoesEnriquecidas, ["beneficiarioNome", "medicamentoNome", "doadorNome", "status", "quantidade", "dataSolicitacao"], "doacoes");
+
   } catch (e) {
     alert(e.message);
     console.error(e);
   }
 }
 
-// Event listener
+// Event listener (sem alterações)
 document.addEventListener("DOMContentLoaded", () => {
   loadAll();
   document.querySelectorAll(".btn-add").forEach(button => {
