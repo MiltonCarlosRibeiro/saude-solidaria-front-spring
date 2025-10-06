@@ -4,12 +4,11 @@ on:
   push:
     branches:
       - main
-      - develop
       - Hugo
   pull_request:
     branches:
       - main
-      - develop
+      - Hugo
 
 env:
   REGISTRY: ghcr.io
