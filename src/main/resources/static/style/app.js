@@ -51,7 +51,7 @@ async function handleDelete(type, id) { if (!confirm(`Tem certeza que deseja exc
 async function handleEdit(type, item) { const fields = document.querySelector(`.btn-add[data-type="${type}"]`).dataset.fields.split(','); const updatedItem = { ...item }; let hasChanged = false; for (const field of fields) { if (field === 'id') continue; const newValue = prompt(`Editar ${field}:`, item[field] ?? ""); if (newValue === null) return; if (newValue !== item[field]) { updatedItem[field] = newValue; hasChanged = true; } } if (hasChanged) { try { await apiRequest(`/${type}/${item.id}`, "PUT", updatedItem); loadAll(); } catch (e) { alert(e.message); console.error(e); } } }
 async function handleCreate(type, fields) { const newItem = {}; for (const field of fields) { const value = prompt(`Digite o valor para ${field}:`); if (value === null) return; newItem[field] = value; } try { await apiRequest(`/${type}`, "POST", newItem); loadAll(); } catch (e) { alert(e.message); console.error(e); } }
 
-// Carrega todos os dados das APIs e preenche as tabelas (LÓGICA PRINCIPAL ALTERADA AQUI)
+// Carrega todos os dados das APIs e preenche as tabelas
 async function loadAll() {
   try {
     const [beneficiarios, doadoresInd, doadoresCorp, medicamentos, doacoes] = await Promise.all([
@@ -79,10 +79,12 @@ async function loadAll() {
       };
     });
 
-    // ALTERAÇÃO AQUI: Adicionado "medicamentoSolicitado" à lista de colunas
     fillTable(document.querySelector("#tbl-beneficiarios tbody"), beneficiarios, ["nomeCompleto", "cpf", "email", "telefone", "medicamentoSolicitado"], "beneficiarios");
     fillTable(document.querySelector("#tbl-doadores-ind tbody"), doadoresInd, ["nome", "email", "telefone"], "doadores-individuais");
-    fillTable(document.querySelector("#tbl-doadores-corp tbody"), corp, ["razaoSocial", "nomeFantasia", "cnpj", "statusConta"], "doadores-corporativos");
+
+    // 👇 CORREÇÃO AQUI: A variável correta é "doadoresCorp"
+    fillTable(document.querySelector("#tbl-doadores-corp tbody"), doadoresCorp, ["razaoSocial", "nomeFantasia", "cnpj", "statusConta"], "doadores-corporativos");
+
     fillTable(document.querySelector("#tbl-medicamentos tbody"), medicamentos, ["nome", "principioAtivo", "status", "quantidade"], "medicamentos");
     fillTable(document.querySelector("#tbl-doacoes tbody"), doacoesEnriquecidas, ["beneficiarioNome", "medicamentoNome", "doadorNome", "status", "quantidade", "dataSolicitacao"], "doacoes");
 
