@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>Saúde Solidária – Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style/app.css" />
+</head>
+<body>
+  <header>
+    <h1>Saúde Solidária</h1>
+    <p>Dados vindos do MongoDB Atlas via Spring Boot</p>
+  </header>
+
+  <main class="grid">
+    <section>
+      <h2>Beneficiários</h2>
+      <table id="tbl-beneficiarios">
+        <thead><tr><th>Nome</th><th>Documento</th><th>Telefone</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Doadores (Individuais)</h2>
+      <table id="tbl-doadores-ind">
+        <thead><tr><th>Nome</th><th>Email</th><th>Telefone</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Doadores (Corporativos)</h2>
+      <table id="tbl-doadores-corp">
+        <thead><tr><th>Razão Social</th><th>CNPJ</th><th>Contato</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Medicamentos</h2>
+      <table id="tbl-medicamentos">
+        <thead><tr><th>Nome</th><th>Fabricante</th><th>Lote</th><th>Validade</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Doações</h2>
+      <table id="tbl-doacoes">
+        <thead><tr><th>Tipo</th><th>Doador ID</th><th>Beneficiário ID</th><th>Medicamento ID</th><th>Qtd</th><th>Data</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="style/app.js"></script>
+</body>
+</html>
