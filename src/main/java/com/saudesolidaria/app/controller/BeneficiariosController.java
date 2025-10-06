@@ -2,59 +2,41 @@ package com.saudesolidaria.app.controller;
 
 import com.saudesolidaria.app.model.Beneficiario;
 import com.saudesolidaria.app.repo.BeneficiarioRepository;
+import com.saudesolidaria.app.repo.DoacaoRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/beneficiarios")
 public class BeneficiariosController {
-  private final BeneficiarioRepository repo;
+  private final BeneficiarioRepository beneficiarioRepo;
+  private final DoacaoRepository doacaoRepo; // Injetar repositório de doação
 
-  public BeneficiariosController(BeneficiarioRepository repo) {
-    this.repo = repo;
+  // Construtor atualizado para receber os dois repositórios
+  public BeneficiariosController(BeneficiarioRepository beneficiarioRepo, DoacaoRepository doacaoRepo) {
+    this.beneficiarioRepo = beneficiarioRepo;
+    this.doacaoRepo = doacaoRepo;
   }
 
-  // READ (All)
-  @GetMapping
-  public List<Beneficiario> all() {
-    return repo.findAll();
-  }
+  // Métodos GET, POST, PUT (sem alterações)
+  @GetMapping public List<Beneficiario> all() { return beneficiarioRepo.findAll(); }
+  @GetMapping("/{id}") public ResponseEntity<Beneficiario> one(@PathVariable String id) { return beneficiarioRepo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build()); }
+  @PostMapping public Beneficiario create(@RequestBody Beneficiario newBeneficiario) { return beneficiarioRepo.save(newBeneficiario); }
+  @PutMapping("/{id}") public ResponseEntity<Beneficiario> update(@PathVariable String id, @RequestBody Beneficiario updatedBeneficiario) { if (!beneficiarioRepo.existsById(id)) { return ResponseEntity.notFound().build(); } updatedBeneficiario.setId(id); return ResponseEntity.ok(beneficiarioRepo.save(updatedBeneficiario)); }
 
-  // READ (by ID)
-  @GetMapping("/{id}")
-  public ResponseEntity<Beneficiario> one(@PathVariable String id) {
-    Optional<Beneficiario> optionalBeneficiario = repo.findById(id);
-    if (optionalBeneficiario.isPresent()) {
-      return ResponseEntity.ok(optionalBeneficiario.get());
-    }
-    return ResponseEntity.notFound().build();
-  }
-
-  // CREATE
-  @PostMapping
-  public Beneficiario create(@RequestBody Beneficiario newBeneficiario) {
-    return repo.save(newBeneficiario);
-  }
-
-  // UPDATE
-  @PutMapping("/{id}")
-  public ResponseEntity<Beneficiario> update(@PathVariable String id, @RequestBody Beneficiario updatedBeneficiario) {
-    if (!repo.existsById(id)) {
-      return ResponseEntity.notFound().build();
-    }
-    updatedBeneficiario.setId(id); // Garante que o ID do objeto é o mesmo da URL
-    return ResponseEntity.ok(repo.save(updatedBeneficiario));
-  }
-
-  // DELETE
+  // DELETE (Atualizado com lógica de cascata)
   @DeleteMapping("/{id}")
+  @Transactional // Garante que ambas as operações funcionem como uma só
   public ResponseEntity<Void> delete(@PathVariable String id) {
-    if (!repo.existsById(id)) {
+    if (!beneficiarioRepo.existsById(id)) {
       return ResponseEntity.notFound().build();
     }
-    repo.deleteById(id);
+    // 1. Deleta as doações associadas ao beneficiário
+    doacaoRepo.deleteByBeneficiarioId(id);
+    // 2. Deleta o próprio beneficiário
+    beneficiarioRepo.deleteById(id);
     return ResponseEntity.noContent().build();
   }
 }

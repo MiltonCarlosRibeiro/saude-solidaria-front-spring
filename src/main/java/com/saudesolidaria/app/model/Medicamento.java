@@ -10,7 +10,9 @@ public class Medicamento {
   @Id
   private String id;
   private String nome;
-  private String fabricante;
-  private String lote;
-  private String validade;
+  private String principioAtivo; // Adicionado
+  private String status;         // Adicionado
+  private Integer quantidade;      // Adicionado
+  private Object doador;         // Adicionado (representa o objeto aninhado)
+  // Os campos "fabricante", "lote" e "validade" foram removidos
 }

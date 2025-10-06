@@ -7,53 +7,68 @@
   <link rel="stylesheet" href="style/app.css" />
 </head>
 <body>
-  <header>
-    <h1>Saúde Solidária</h1>
-    <p>Dados vindos do MongoDB Atlas via Spring Boot</p>
-  </header>
+<header>
+  <h1>Saúde Solidária</h1>
+  <p>Dados vindos do MongoDB Atlas via Spring Boot</p>
+</header>
 
-  <main class="grid">
-    <section>
+<main class="grid">
+  <section>
+    <div class="section-header">
       <h2>Beneficiários</h2>
-      <table id="tbl-beneficiarios">
-        <thead><tr><th>Nome</th><th>Documento</th><th>Telefone</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
+      <button class="btn-add" data-type="beneficiarios" data-fields="nomeCompleto,cpf,email,endereco,telefone">Novo Beneficiário</button>
+    </div>
+    <table id="tbl-beneficiarios">
+      <thead><tr><th>Nome Completo</th><th>CPF</th><th>Email</th><th>Telefone</th><th>Ações</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
 
-    <section>
+  <section>
+    <div class="section-header">
       <h2>Doadores (Individuais)</h2>
-      <table id="tbl-doadores-ind">
-        <thead><tr><th>Nome</th><th>Email</th><th>Telefone</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
+      <button class="btn-add" data-type="doadores-individuais" data-fields="nome,email,telefone">Novo Doador</button>
+    </div>
+    <table id="tbl-doadores-ind">
+      <thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Ações</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
 
-    <section>
+  <section>
+    <div class="section-header">
       <h2>Doadores (Corporativos)</h2>
-      <table id="tbl-doadores-corp">
-        <thead><tr><th>Razão Social</th><th>CNPJ</th><th>Contato</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
+      <button class="btn-add" data-type="doadores-corporativos" data-fields="razaoSocial,nomeFantasia,cnpj,statusConta">Novo Doador</button>
+    </div>
+    <table id="tbl-doadores-corp">
+      <thead><tr><th>Razão Social</th><th>Nome Fantasia</th><th>CNPJ</th><th>Status</th><th>Ações</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
 
-    <section>
+  <section>
+    <div class="section-header">
       <h2>Medicamentos</h2>
-      <table id="tbl-medicamentos">
-        <thead><tr><th>Nome</th><th>Fabricante</th><th>Lote</th><th>Validade</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
+      <button class="btn-add" data-type="medicamentos" data-fields="nome,principioAtivo,status,quantidade">Novo Medicamento</button>
+    </div>
+    <table id="tbl-medicamentos">
+      <thead><tr><th>Nome</th><th>Princípio Ativo</th><th>Status</th><th>Quantidade</th><th>Ações</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
 
-    <section>
+  <section>
+    <div class="section-header">
       <h2>Doações</h2>
-      <table id="tbl-doacoes">
-        <thead><tr><th>Tipo</th><th>Doador ID</th><th>Beneficiário ID</th><th>Medicamento ID</th><th>Qtd</th><th>Data</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
-  </main>
+      <button class="btn-add" data-type="doacoes" data-fields="doadorId,beneficiarioId,medicamentoId,quantidade,status,dataSolicitacao">Nova Doação</button>
+    </div>
+    <table id="tbl-doacoes">
+      <thead><tr><th>Beneficiário ID</th><th>Medicamento ID</th><th>Status</th><th>Qtd</th><th>Data Solicitação</th><th>Ações</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
 
-  <script src="style/app.js"></script>
+<script src="style/app.js"></script>
 </body>
 </html>

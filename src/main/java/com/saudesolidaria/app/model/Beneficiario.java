@@ -9,8 +9,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Beneficiario {
   @Id
   private String id;
-  private String nome;
-  private String documento;
+  private String nomeCompleto; // Alterado de "nome"
+  private String cpf;          // Alterado de "documento"
+  private String email;        // Adicionado
   private String endereco;
   private String telefone;
 }

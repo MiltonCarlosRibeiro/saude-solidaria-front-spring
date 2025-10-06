@@ -10,6 +10,8 @@ public class DoadorCorporativo {
   @Id
   private String id;
   private String razaoSocial;
+  private String nomeFantasia; // Adicionado
   private String cnpj;
-  private String contato;
+  private String statusConta;  // Adicionado
+  // O campo "contato" foi removido para alinhar com o banco de dados
 }
