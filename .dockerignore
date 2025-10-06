@@ -1,0 +1,22 @@
+# Ignora diretórios de build e cache
+target/
+.idea/
+.vscode/
+.git/
+.gitignore
+
+# Ignora arquivos temporários e do sistema
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# Ignora arquivos de configuração locais
+*.env
+*.iml
+*.class
+
+# Ignora credenciais sensíveis
+src/main/resources/firebase-service-account.json
+application-local.properties

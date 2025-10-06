@@ -14,6 +14,6 @@ FROM eclipse-temurin:${JDK_VERSION}-jre-alpine
 WORKDIR /app
 RUN addgroup -S spring && adduser -S spring -G spring
 COPY --from=build /app/target/*.jar /app/app.jar
-EXPOSE 8080
+EXPOSE 3000
 USER spring
 ENTRYPOINT ["java","-jar","/app/app.jar"]
