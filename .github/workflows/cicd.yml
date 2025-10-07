@@ -3,11 +3,11 @@ name: CI/CD - Spring Boot
 on:
   push:
     branches:
-      - main
+      - master
       - Hugo
   pull_request:
     branches:
-      - main
+      - master
       - Hugo
 
 env:
@@ -49,7 +49,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   deploy-staging:
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/Hugo'
     needs: docker
     runs-on: ubuntu-latest
     environment: staging
@@ -68,7 +68,7 @@ jobs:
             docker image prune -f
 
   deploy-production:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     needs: docker
     runs-on: ubuntu-latest
     environment: production
