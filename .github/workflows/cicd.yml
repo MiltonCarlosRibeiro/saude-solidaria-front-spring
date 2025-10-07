@@ -20,16 +20,13 @@ jobs:
     permissions:
       contents: read
       packages: write
+    environment: GHCR_TOKEN
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to GHCR (with secret token)
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Extract metadata (tags, labels)
         id: meta
@@ -61,7 +58,7 @@ jobs:
           username: ${{ secrets.STAGING_USER }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
-            docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
             cd ${{ secrets.STAGING_PATH }}
             docker compose -f docker-compose.staging.yml pull
             docker compose -f docker-compose.staging.yml up -d
@@ -80,7 +77,7 @@ jobs:
           username: ${{ secrets.PROD_USER }}
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
-            docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
             cd ${{ secrets.PROD_PATH }}
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
