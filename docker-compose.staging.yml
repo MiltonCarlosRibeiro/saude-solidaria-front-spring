@@ -1,0 +1,8 @@
+services:
+  app:
+    image: ghcr.io/miltoncarlosribeiro/saude-solidaria-front-spring:Hugo
+    container_name: saude-solidaria-staging
+    env_file: .env.staging
+    ports:
+      - "8081:8080"
+    restart: always

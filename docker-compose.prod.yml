@@ -1,0 +1,9 @@
+
+services:
+  app:
+    image: ghcr.io/miltoncarlosribeiro/saude-solidaria-front-spring:master
+    container_name: saude-solidaria-prod
+    env_file: .env.prod
+    ports:
+      - "8080:8080"
+    restart: always
