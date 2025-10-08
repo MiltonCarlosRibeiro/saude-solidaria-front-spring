@@ -15,20 +15,29 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
+  # ==========================================================
+  # 1️⃣ JOB: Build & Push da imagem Docker
+  # ==========================================================
   docker:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     environment: GHCR_TOKEN
+
     steps:
-      - name: Checkout code
+      - name: 📦 Checkout do código
         uses: actions/checkout@v4
 
-      - name: Login to GHCR (with secret token)
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: 🔐 Login no GitHub Container Registry
+        run: |
+          if [ -z "${{ secrets.GHCR_TOKEN }}" ]; then
+            echo "❌ ERRO: GHCR_TOKEN está vazio."
+            exit 1
+          fi
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Extract metadata (tags, labels)
+      - name: 🏷️ Extrair metadados da imagem
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -37,7 +46,7 @@ jobs:
             type=ref,event=branch
             type=sha
 
-      - name: Build and Push Docker image
+      - name: 🏗️ Build e Push da imagem para GHCR
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -45,40 +54,60 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+  # ==========================================================
+  # 2️⃣ JOB: Deploy Staging (branch Hugo)
+  # ==========================================================
   deploy-staging:
     if: github.ref == 'refs/heads/Hugo'
     needs: docker
     runs-on: ubuntu-latest
     environment: staging
+
     steps:
-      - name: Deploy to staging via SSH + Docker Compose
+      - name: 🚀 Deploy para STAGING via SSH + Docker Compose
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.STAGING_HOST }}
           username: ${{ secrets.STAGING_USER }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
+            echo "🚀 Iniciando deploy no servidor STAGING..."
+            if [ -z "${{ secrets.GHCR_TOKEN }}" ]; then
+              echo "❌ ERRO: GHCR_TOKEN está vazio."
+              exit 1
+            fi
             docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
-            cd /opt/saude-solidaria
+            cd /opt/saude-solidaria-front-spring
             docker compose -f docker-compose.staging.yml pull
             docker compose -f docker-compose.staging.yml up -d
             docker image prune -f
+            echo "✅ Deploy STAGING finalizado!"
 
+  # ==========================================================
+  # 3️⃣ JOB: Deploy Produção (branch master)
+  # ==========================================================
   deploy-production:
     if: github.ref == 'refs/heads/master'
     needs: docker
     runs-on: ubuntu-latest
     environment: production
+
     steps:
-      - name: Deploy to production via SSH + Docker Compose
+      - name: 🚀 Deploy para PRODUÇÃO via SSH + Docker Compose
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.PROD_HOST }}
           username: ${{ secrets.PROD_USER }}
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
+            echo "🚀 Iniciando deploy no servidor PRODUÇÃO..."
+            if [ -z "${{ secrets.GHCR_TOKEN }}" ]; then
+              echo "❌ ERRO: GHCR_TOKEN está vazio."
+              exit 1
+            fi
             docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
-            cd /opt/saude-solidaria
+            cd /opt/saude-solidaria-front-spring
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
             docker image prune -f
+            echo "✅ Deploy PRODUÇÃO finalizado!"
